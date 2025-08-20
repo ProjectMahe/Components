@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Display</title>
+    <title>Pop-up Display with Sound</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,7 +15,7 @@
             align-items: center;
             height: 100vh;
         }
-        
+
         .container {
             text-align: center;
         }
@@ -156,9 +156,23 @@
         <button id="showWrong">Show Wrong</button>
     </div>
 
+    <audio id="successSound" src="https://projectmahe.github.io/Components/popup/successSound.mp3" preload="auto"></audio>
+    <audio id="wrongSound" src="https://projectmahe.github.io/Components/popup/wrongSound.mp3" preload="auto"></audio>
+
     <script>
+        // Get the audio elements
+        const successSound = document.getElementById('successSound');
+        const wrongSound = document.getElementById('wrongSound');
+
         function showPopDisplay(message, type = 'success') {
-            // Remove any existing pop-ups to prevent stacking
+            // Play the appropriate sound
+            if (type === 'success') {
+                successSound.play().catch(e => console.error("Error playing success sound:", e));
+            } else if (type === 'wrong') {
+                wrongSound.play().catch(e => console.error("Error playing wrong sound:", e));
+            }
+
+            // The rest of your existing pop-up code
             const existingPop = document.querySelector('.pop-display');
             if (existingPop) {
                 existingPop.remove();
@@ -176,19 +190,16 @@
             
             document.body.appendChild(popDisplay);
 
-            // Trigger the animation by adding the 'show' class
             setTimeout(() => {
                 popDisplay.classList.add('show');
             }, 10);
 
-            // Auto-remove after 5 seconds
             const timeoutId = setTimeout(() => {
                 popDisplay.remove();
             }, 5000);
 
-            // Close button functionality
             popDisplay.querySelector('.pop-close').addEventListener('click', () => {
-                clearTimeout(timeoutId); // Clear the auto-remove timeout
+                clearTimeout(timeoutId);
                 popDisplay.remove();
             });
         }
@@ -209,16 +220,15 @@
                     </svg>
                 `;
             }
-            return ''; // Default or empty
+            return '';
         }
 
-        // Event listeners to show the pop-ups
         document.getElementById('showSuccess').addEventListener('click', () => {
             showPopDisplay('Article marked as read.', 'success');
         });
 
         document.getElementById('showWrong').addEventListener('click', () => {
-            showPopDisplay('Failed to save article.', 'wrong');
+            showPopDisplay('Failed to save article. Please try again.', 'wrong');
         });
     </script>
 
