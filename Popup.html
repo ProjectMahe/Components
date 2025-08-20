@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pop-up Display</title>
+    <style>
+        
+        .container {
+            text-align: center;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            margin: 0 10px;
+        }
+
+        #showSuccess {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #showWrong {
+            background-color: #F44336;
+            color: white;
+        }
+
+        /* --- Pop-up Display Styles --- */
+        .pop-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            color: #333;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .pop-display.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .pop-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 15px;
+        }
+
+        /* Success Icon Styles */
+        .success-icon .pop-icon-circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 2;
+            stroke-miterlimit: 10;
+            stroke: #4CAF50;
+            fill: none;
+            animation: stroke-circle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+
+        .success-icon .pop-icon-check {
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            stroke-width: 2;
+            stroke-miterlimit: 10;
+            stroke: #4CAF50;
+            fill: none;
+            transform-origin: 50% 50%;
+            animation: stroke-check 0.6s cubic-bezier(0.65, 0, 0.45, 1) 0.3s forwards;
+        }
+
+        @keyframes stroke-circle {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes stroke-check {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* Wrong Icon Styles */
+        .wrong-display {
+            background-color: #ffebee;
+        }
+        
+        .wrong-icon .pop-icon-circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 2;
+            stroke-miterlimit: 10;
+            stroke: #F44336;
+            fill: none;
+            animation: stroke-circle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+
+        .wrong-icon .pop-icon-x {
+            fill: #F44336;
+            transform: scale(0);
+            transform-origin: 50% 50%;
+            animation: scale-in 0.3s ease-in-out 0.4s forwards;
+        }
+
+        @keyframes scale-in {
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .pop-message {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .pop-close {
+            margin-left: 20px;
+            font-size: 24px;
+            line-height: 1;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .pop-close:hover {
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Pop-up Examples</h1>
+        <button id="showSuccess">Show Success</button>
+        <button id="showWrong">Show Wrong</button>
+    </div>
+
+    <script>
+        function showPopDisplay(message, type = 'success') {
+            // Remove any existing pop-ups to prevent stacking
+            const existingPop = document.querySelector('.pop-display');
+            if (existingPop) {
+                existingPop.remove();
+            }
+
+            const popDisplay = document.createElement('div');
+            popDisplay.className = `pop-display ${type}-display`;
+            popDisplay.innerHTML = `
+                <div class="pop-icon ${type}-icon">
+                    ${getIconSVG(type)}
+                </div>
+                <div class="pop-message">${message}</div>
+                <div class="pop-close">&times;</div>
+            `;
+            
+            document.body.appendChild(popDisplay);
+
+            // Trigger the animation by adding the 'show' class
+            setTimeout(() => {
+                popDisplay.classList.add('show');
+            }, 10);
+
+            // Auto-remove after 5 seconds
+            const timeoutId = setTimeout(() => {
+                popDisplay.remove();
+            }, 5000);
+
+            // Close button functionality
+            popDisplay.querySelector('.pop-close').addEventListener('click', () => {
+                clearTimeout(timeoutId); // Clear the auto-remove timeout
+                popDisplay.remove();
+            });
+        }
+
+        function getIconSVG(type) {
+            if (type === 'success') {
+                return `
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                        <circle class="pop-icon-circle" cx="26" cy="26" r="25" fill="none"/>
+                        <path class="pop-icon-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                    </svg>
+                `;
+            } else if (type === 'wrong') {
+                return `
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                        <circle class="pop-icon-circle" cx="26" cy="26" r="25" fill="none"/>
+                        <path class="pop-icon-x" d="M26,0C11.6,0,0,11.6,0,26s11.6,26,26,26s26-11.6,26-26S40.4,0,26,0z M35.3,35.3c-0.8,0.8-2,0.8-2.8,0L26,28.8l-6.5,6.5c-0.8,0.8-2,0.8-2.8,0s-0.8-2,0-2.8L23.2,26l-6.5-6.5c-0.8-0.8-0.8-2,0-2.8s2-0.8,2.8,0L26,23.2l6.5-6.5c0.8-0.8,2-0.8,2.8,0s0.8,2,0,2.8L28.8,26l6.5,6.5C36.1,33.3,36.1,34.5,35.3,35.3z"/>
+                    </svg>
+                `;
+            }
+            return ''; // Default or empty
+        }
+
+        // Event listeners to show the pop-ups
+        document.getElementById('showSuccess').addEventListener('click', () => {
+            showPopDisplay('Article marked as read.', 'success');
+        });
+
+        document.getElementById('showWrong').addEventListener('click', () => {
+            showPopDisplay('Failed to save article.', 'wrong');
+        });
+    </script>
+
+</body>
+</html>
